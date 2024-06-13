@@ -32,7 +32,7 @@ This repository contains the code for the experiments in the 'Investigating the 
 
 The code for generating images using the Stable Diffusion model with prompt interpolation is the `imageGen.py` script.
 
-![Overview of Synthesis Process](results/viz/synthesis%20overview.png)
+![Overview of Synthesis Process](results/viz/synthesis%20overview.svg)
 
 To replicate the results, use the following seed values:
 
@@ -167,7 +167,7 @@ data/
 
 The trained classifiers are available on the HuggingFace model hub: [Generative Augmented Classifiers](https://huggingface.co/spaces/czl/generative-augmented-classifiers).
 
-![Training Overview](results/viz/classifier%20training%20overview.png)
+![Training Overview](results/viz/classifier%20training%20overview.svg)
 
 In the demo, you have the option to select the classifier to evaluate the generated images and download the model for further evaluation.
 Alternatively, navigate to the `models` [folder](https://huggingface.co/spaces/czl/generative-augmented-classifiers/tree/main/models) to download the classifiers.
