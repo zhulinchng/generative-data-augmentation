@@ -1,0 +1,3 @@
+ds,n_images_synthetic,n_images_synthetic_cleaned,abs_change,rel_change
+imagenette,9495,8053,-1442,-0.15186940494997367
+woof,9046,6911,-2135,-0.2360159186380721

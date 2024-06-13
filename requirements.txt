@@ -1,0 +1,29 @@
+# cudnn, nvidia-cuda-toolkit, (ptxas if distributed training)
+# Python 3.11.x
+compel
+cvxpy
+DeepCache
+diffusers[torch]
+gradio
+ipykernel
+ipywidgets
+jupyter
+matplotlib
+numpy
+pandas[hdf5, parquet, feather, spss, excel]
+plotly==5.22.0
+schedulefree
+scikit-learn
+scipy
+scipy
+seaborn
+timm==0.3.2
+tomesd
+torch==2.1.2
+torchaudio==2.1.2
+torchmetrics[image]
+torchvision==0.16.2
+tqdm
+transformers
+wandb
+xformers==0.0.23.post1

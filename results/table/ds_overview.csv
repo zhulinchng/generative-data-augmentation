@@ -1,0 +1,12 @@
+ds,type,n_images
+imagenette,synthetic,9495
+imagenette,synthetic-cleaned,8053
+imagenette,train,9469
+imagenette,val,3925
+stanford-dogs,synthetic,12120
+stanford-dogs,train,12000
+stanford-dogs,val,8580
+woof,synthetic,9046
+woof,synthetic-cleaned,6911
+woof,train,9025
+woof,val,3929

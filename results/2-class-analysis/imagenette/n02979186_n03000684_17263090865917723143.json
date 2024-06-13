@@ -1,0 +1,546 @@
+{
+    "class_pairs": [
+        "n02979186",
+        "n03000684"
+    ],
+    "path": "poc/imagenette/synthetic",
+    "seed": 17263090865917723143,
+    "params": {
+        "CFG": 8,
+        "inferenceSteps": 25,
+        "interpolationSteps": 16,
+        "sampleMidInterpolation": 16,
+        "height": 512,
+        "width": 512
+    },
+    "prompt_text_0": "a photo of a cassette player",
+    "negative_prompt_text_0": "blurry image, disfigured, deformed, distorted, cartoon, drawings",
+    "prompt_text_1": "a photo of a chain saw, chainsaw",
+    "negative_prompt_text_1": "blurry image, disfigured, deformed, distorted, cartoon, drawings",
+    "pipe_config": {
+        "vae": [
+            "diffusers",
+            "AutoencoderKL"
+        ],
+        "text_encoder": [
+            "transformers",
+            "CLIPTextModel"
+        ],
+        "tokenizer": [
+            "transformers",
+            "CLIPTokenizer"
+        ],
+        "unet": [
+            "diffusers",
+            "UNet2DConditionModel"
+        ],
+        "scheduler": [
+            "diffusers",
+            "LMSDiscreteScheduler"
+        ],
+        "safety_checker": [
+            null,
+            null
+        ],
+        "feature_extractor": [
+            "transformers",
+            "CLIPImageProcessor"
+        ],
+        "image_encoder": [
+            null,
+            null
+        ],
+        "requires_safety_checker": true,
+        "_name_or_path": "./models/stable-diffusion-v1-5"
+    },
+    "prompt_embed_similarity": {
+        "0": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 0.5131431221961975,
+                "class1_relative_distance": 0.6608760171665624,
+                "class2_relative_distance": 0.3391239828334376
+            },
+            "nearest_class": 0
+        },
+        "1": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.9976428151130676,
+                "class2": 0.5701038241386414,
+                "class1_relative_distance": 0.636354618874671,
+                "class2_relative_distance": 0.36364538112532896
+            },
+            "nearest_class": 0
+        },
+        "2": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.9905282258987427,
+                "class2": 0.6248489618301392,
+                "class1_relative_distance": 0.6131869593202333,
+                "class2_relative_distance": 0.38681304067976674
+            },
+            "nearest_class": 0
+        },
+        "3": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.9786204695701599,
+                "class2": 0.6770200729370117,
+                "class1_relative_distance": 0.591082692435288,
+                "class2_relative_distance": 0.408917307564712
+            },
+            "nearest_class": 0
+        },
+        "4": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.9619263410568237,
+                "class2": 0.7262616753578186,
+                "class1_relative_distance": 0.5697981099876267,
+                "class2_relative_distance": 0.4302018900123733
+            },
+            "nearest_class": 0
+        },
+        "5": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.9405019283294678,
+                "class2": 0.7722280025482178,
+                "class1_relative_distance": 0.5491244774635947,
+                "class2_relative_distance": 0.4508755225364053
+            },
+            "nearest_class": 0
+        },
+        "6": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.9144560694694519,
+                "class2": 0.8145917057991028,
+                "class1_relative_distance": 0.5288784280858978,
+                "class2_relative_distance": 0.4711215719141022
+            },
+            "nearest_class": 0
+        },
+        "7": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.8839536309242249,
+                "class2": 0.8530535101890564,
+                "class1_relative_distance": 0.5088946441277622,
+                "class2_relative_distance": 0.4911053558722378
+            },
+            "nearest_class": 0
+        },
+        "8": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.8492132425308228,
+                "class2": 0.8873538970947266,
+                "class1_relative_distance": 0.4890183760553802,
+                "class2_relative_distance": 0.5109816239446199
+            },
+            "nearest_class": 1
+        },
+        "9": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.8105015158653259,
+                "class2": 0.9172810912132263,
+                "class1_relative_distance": 0.46909924462995656,
+                "class2_relative_distance": 0.5309007553700434
+            },
+            "nearest_class": 1
+        },
+        "10": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.7681237459182739,
+                "class2": 0.9426789879798889,
+                "class1_relative_distance": 0.44898440404526335,
+                "class2_relative_distance": 0.5510155959547367
+            },
+            "nearest_class": 1
+        },
+        "11": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.7224117517471313,
+                "class2": 0.9634474515914917,
+                "class1_relative_distance": 0.42851250585843087,
+                "class2_relative_distance": 0.5714874941415691
+            },
+            "nearest_class": 1
+        },
+        "12": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.6737111806869507,
+                "class2": 0.9795410633087158,
+                "class1_relative_distance": 0.4075065877779729,
+                "class2_relative_distance": 0.5924934122220271
+            },
+            "nearest_class": 1
+        },
+        "13": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.6223717927932739,
+                "class2": 0.9909628629684448,
+                "class1_relative_distance": 0.3857673239526537,
+                "class2_relative_distance": 0.6142326760473463
+            },
+            "nearest_class": 1
+        },
+        "14": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.5687377452850342,
+                "class2": 0.997756838798523,
+                "class1_relative_distance": 0.36306397166241183,
+                "class2_relative_distance": 0.6369360283375882
+            },
+            "nearest_class": 1
+        },
+        "15": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.5131431221961975,
+                "class2": 1.0,
+                "class1_relative_distance": 0.33912398283343764,
+                "class2_relative_distance": 0.6608760171665624
+            },
+            "nearest_class": 1
+        }
+    },
+    "negative_prompt_embed_similarity": {
+        "0": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "1": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "2": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "3": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "4": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "5": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "6": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "7": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "8": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "9": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "10": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "11": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "12": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "13": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "14": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "15": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        }
+    },
+    "ssim_scores": {
+        "n02979186": {
+            "0": {
+                "ssim_sum": 62.51967640221119,
+                "ssim_count": 124,
+                "ssim_avg": 0.5041909387275096
+            },
+            "1": {
+                "ssim_sum": 62.49235589802265,
+                "ssim_count": 125,
+                "ssim_avg": 0.4999388471841812
+            },
+            "2": {
+                "ssim_sum": 62.30682723224163,
+                "ssim_count": 122,
+                "ssim_avg": 0.5107116986249314
+            },
+            "3": {
+                "ssim_sum": 63.31883670389652,
+                "ssim_count": 124,
+                "ssim_avg": 0.5106357798701332
+            },
+            "4": {
+                "ssim_sum": 65.54942487180233,
+                "ssim_count": 125,
+                "ssim_avg": 0.5243953989744187
+            },
+            "5": {
+                "ssim_sum": 63.556983187794685,
+                "ssim_count": 125,
+                "ssim_avg": 0.5084558655023574
+            },
+            "6": {
+                "ssim_sum": 65.10409066081047,
+                "ssim_count": 125,
+                "ssim_avg": 0.5208327252864837
+            },
+            "7": {
+                "ssim_sum": 63.47375378012657,
+                "ssim_count": 123,
+                "ssim_avg": 0.516046778700216
+            },
+            "8": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "9": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "10": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "11": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "12": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "13": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "14": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "15": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            }
+        },
+        "n03000684": {
+            "0": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "1": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "2": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "3": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "4": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "5": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "6": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "7": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "8": {
+                "ssim_sum": 41.87610162049532,
+                "ssim_count": 107,
+                "ssim_avg": 0.39136543570556376
+            },
+            "9": {
+                "ssim_sum": 43.763449005782604,
+                "ssim_count": 108,
+                "ssim_avg": 0.405217120423913
+            },
+            "10": {
+                "ssim_sum": 43.45007325708866,
+                "ssim_count": 107,
+                "ssim_avg": 0.4060754510008286
+            },
+            "11": {
+                "ssim_sum": 43.474733754992485,
+                "ssim_count": 107,
+                "ssim_avg": 0.406305922943855
+            },
+            "12": {
+                "ssim_sum": 36.16487208753824,
+                "ssim_count": 108,
+                "ssim_avg": 0.3348599267364652
+            },
+            "13": {
+                "ssim_sum": 41.786765433847904,
+                "ssim_count": 106,
+                "ssim_avg": 0.39421476824384816
+            },
+            "14": {
+                "ssim_sum": 39.39656341075897,
+                "ssim_count": 108,
+                "ssim_avg": 0.36478299454406454
+            },
+            "15": {
+                "ssim_sum": 39.43968988955021,
+                "ssim_count": 107,
+                "ssim_avg": 0.3685952326126188
+            }
+        }
+    }
+}

@@ -1,0 +1,546 @@
+{
+    "class_pairs": [
+        "n02087394",
+        "n02088364"
+    ],
+    "path": "poc/woof/synthetic",
+    "seed": 8414735378500,
+    "params": {
+        "CFG": 8,
+        "inferenceSteps": 25,
+        "interpolationSteps": 16,
+        "sampleMidInterpolation": 16,
+        "height": 512,
+        "width": 512
+    },
+    "prompt_text_0": "a photo of a Rhodesian ridgeback, a type of dog",
+    "negative_prompt_text_0": "blurry image, disfigured, deformed, distorted, cartoon, drawings",
+    "prompt_text_1": "a photo of a beagle, a type of dog",
+    "negative_prompt_text_1": "blurry image, disfigured, deformed, distorted, cartoon, drawings",
+    "pipe_config": {
+        "vae": [
+            "diffusers",
+            "AutoencoderKL"
+        ],
+        "text_encoder": [
+            "transformers",
+            "CLIPTextModel"
+        ],
+        "tokenizer": [
+            "transformers",
+            "CLIPTokenizer"
+        ],
+        "unet": [
+            "diffusers",
+            "UNet2DConditionModel"
+        ],
+        "scheduler": [
+            "diffusers",
+            "LMSDiscreteScheduler"
+        ],
+        "safety_checker": [
+            null,
+            null
+        ],
+        "feature_extractor": [
+            "transformers",
+            "CLIPImageProcessor"
+        ],
+        "image_encoder": [
+            null,
+            null
+        ],
+        "requires_safety_checker": true,
+        "_name_or_path": "./models/stable-diffusion-v1-5"
+    },
+    "prompt_embed_similarity": {
+        "0": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 0.5756140947341919,
+                "class1_relative_distance": 0.6346731749494163,
+                "class2_relative_distance": 0.36532682505058367
+            },
+            "nearest_class": 0
+        },
+        "1": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.9980663657188416,
+                "class2": 0.6242371797561646,
+                "class1_relative_distance": 0.6152155485961232,
+                "class2_relative_distance": 0.38478445140387685
+            },
+            "nearest_class": 0
+        },
+        "2": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.9921857118606567,
+                "class2": 0.671172559261322,
+                "class1_relative_distance": 0.5964954929351459,
+                "class2_relative_distance": 0.4035045070648541
+            },
+            "nearest_class": 0
+        },
+        "3": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.9822501540184021,
+                "class2": 0.7161568999290466,
+                "class1_relative_distance": 0.5783361248620876,
+                "class2_relative_distance": 0.42166387513791237
+            },
+            "nearest_class": 0
+        },
+        "4": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.9681795835494995,
+                "class2": 0.7588886618614197,
+                "class1_relative_distance": 0.5605913872379384,
+                "class2_relative_distance": 0.43940861276206156
+            },
+            "nearest_class": 0
+        },
+        "5": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.9499401450157166,
+                "class2": 0.7990354299545288,
+                "class1_relative_distance": 0.5431408869342715,
+                "class2_relative_distance": 0.45685911306572846
+            },
+            "nearest_class": 0
+        },
+        "6": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.9275615811347961,
+                "class2": 0.8362476229667664,
+                "class1_relative_distance": 0.5258854409977248,
+                "class2_relative_distance": 0.47411455900227517
+            },
+            "nearest_class": 0
+        },
+        "7": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.9011480212211609,
+                "class2": 0.8701827526092529,
+                "class1_relative_distance": 0.5087406793438549,
+                "class2_relative_distance": 0.4912593206561451
+            },
+            "nearest_class": 0
+        },
+        "8": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.8708826303482056,
+                "class2": 0.9005293250083923,
+                "class1_relative_distance": 0.49163190285282377,
+                "class2_relative_distance": 0.5083680971471762
+            },
+            "nearest_class": 1
+        },
+        "9": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.8370169401168823,
+                "class2": 0.9270328879356384,
+                "class1_relative_distance": 0.47448599626062377,
+                "class2_relative_distance": 0.5255140037393762
+            },
+            "nearest_class": 1
+        },
+        "10": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.7998520731925964,
+                "class2": 0.9495108723640442,
+                "class1_relative_distance": 0.4572247715799688,
+                "class2_relative_distance": 0.5427752284200311
+            },
+            "nearest_class": 1
+        },
+        "11": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.7597136497497559,
+                "class2": 0.9678576588630676,
+                "class1_relative_distance": 0.43975820040666114,
+                "class2_relative_distance": 0.5602417995933389
+            },
+            "nearest_class": 1
+        },
+        "12": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.7169278860092163,
+                "class2": 0.9820387959480286,
+                "class1_relative_distance": 0.4219787789971846,
+                "class2_relative_distance": 0.5780212210028154
+            },
+            "nearest_class": 1
+        },
+        "13": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.6718024015426636,
+                "class2": 0.9920772910118103,
+                "class1_relative_distance": 0.40375659643473255,
+                "class2_relative_distance": 0.5962434035652675
+            },
+            "nearest_class": 1
+        },
+        "14": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.6246158480644226,
+                "class2": 0.9980354905128479,
+                "class1_relative_distance": 0.3849353420631209,
+                "class2_relative_distance": 0.615064657936879
+            },
+            "nearest_class": 1
+        },
+        "15": {
+            "selected": true,
+            "similarity": {
+                "class1": 0.5756140947341919,
+                "class2": 1.0,
+                "class1_relative_distance": 0.36532682505058367,
+                "class2_relative_distance": 0.6346731749494163
+            },
+            "nearest_class": 1
+        }
+    },
+    "negative_prompt_embed_similarity": {
+        "0": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "1": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "2": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "3": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "4": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "5": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "6": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "7": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "8": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "9": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "10": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "11": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "12": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "13": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "14": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        },
+        "15": {
+            "selected": true,
+            "similarity": {
+                "class1": 1.0,
+                "class2": 1.0,
+                "class1_relative_distance": 0.5,
+                "class2_relative_distance": 0.5
+            },
+            "nearest_class": 0
+        }
+    },
+    "ssim_scores": {
+        "n02087394": {
+            "0": {
+                "ssim_sum": 43.61481887102127,
+                "ssim_count": 118,
+                "ssim_avg": 0.36961710907645146
+            },
+            "1": {
+                "ssim_sum": 42.15485369414091,
+                "ssim_count": 117,
+                "ssim_avg": 0.3602978948217172
+            },
+            "2": {
+                "ssim_sum": 43.7829941958189,
+                "ssim_count": 118,
+                "ssim_avg": 0.3710423236933805
+            },
+            "3": {
+                "ssim_sum": 41.33136247843504,
+                "ssim_count": 118,
+                "ssim_avg": 0.35026578371555117
+            },
+            "4": {
+                "ssim_sum": 45.24713736027479,
+                "ssim_count": 118,
+                "ssim_avg": 0.38345031661249823
+            },
+            "5": {
+                "ssim_sum": 46.855510756373405,
+                "ssim_count": 118,
+                "ssim_avg": 0.3970805996302831
+            },
+            "6": {
+                "ssim_sum": 47.37779701501131,
+                "ssim_count": 117,
+                "ssim_avg": 0.4049384360257377
+            },
+            "7": {
+                "ssim_sum": 45.539769411087036,
+                "ssim_count": 118,
+                "ssim_avg": 0.3859302492465003
+            },
+            "8": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "9": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "10": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "11": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "12": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "13": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "14": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "15": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            }
+        },
+        "n02088364": {
+            "0": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "1": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "2": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "3": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "4": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "5": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "6": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "7": {
+                "ssim_sum": 0,
+                "ssim_count": 0,
+                "ssim_avg": 0
+            },
+            "8": {
+                "ssim_sum": 46.89114684611559,
+                "ssim_count": 117,
+                "ssim_avg": 0.4007790328727828
+            },
+            "9": {
+                "ssim_sum": 48.47787679731846,
+                "ssim_count": 115,
+                "ssim_avg": 0.42154675475929093
+            },
+            "10": {
+                "ssim_sum": 45.24172192811966,
+                "ssim_count": 116,
+                "ssim_avg": 0.3900148442079281
+            },
+            "11": {
+                "ssim_sum": 47.35983742028475,
+                "ssim_count": 116,
+                "ssim_avg": 0.4082744605196961
+            },
+            "12": {
+                "ssim_sum": 46.65709586814046,
+                "ssim_count": 118,
+                "ssim_avg": 0.39539911752661405
+            },
+            "13": {
+                "ssim_sum": 44.38493746519089,
+                "ssim_count": 116,
+                "ssim_avg": 0.38262877125164557
+            },
+            "14": {
+                "ssim_sum": 46.72038496285677,
+                "ssim_count": 117,
+                "ssim_avg": 0.3993195295970664
+            },
+            "15": {
+                "ssim_sum": 46.780014634132385,
+                "ssim_count": 117,
+                "ssim_avg": 0.3998291849071144
+            }
+        }
+    }
+}
