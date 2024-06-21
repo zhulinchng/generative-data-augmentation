@@ -1,6 +1,6 @@
 # Generative Data Augmentation
 
-This repository contains the code for the experiments in the 'Investigating the Effectiveness of Generative Diffusion Models in Synthesizing Images for Data Augmentation in Image Classification' dissertation.
+This repository contains the code for the experiments in the 'Improving Fine-Grained Image Classification Using Diffusion-Based Generated Synthetic Images' dissertation.
 
 <div align="center">
  Try the HuggingFace 🤗 demo
