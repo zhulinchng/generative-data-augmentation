@@ -15,7 +15,6 @@ plotly==5.22.0
 schedulefree
 scikit-learn
 scipy
-scipy
 seaborn
 timm==0.3.2
 tomesd
