@@ -18,7 +18,7 @@ scipy
 seaborn
 timm==0.3.2
 tomesd
-torch==2.1.2
+torch==2.2.0
 torchaudio==2.1.2
 torchmetrics[image]
 torchvision==0.16.2
