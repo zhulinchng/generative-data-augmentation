@@ -40,77 +40,75 @@ from torchvision import transforms
 
 def get_top_misclassified(val_classifier_json):
     """
-    Retrieves the top misclassified classes from a validation classifier JSON file.
+    Retrieve top misclassified classes from validation metrics.
 
     Args:
-        val_classifier_json (str): The path to the validation classifier JSON file.
+        val_classifier_json (str): Path to validation classifier JSON file.
 
     Returns:
-        dict: A dictionary containing the top misclassified classes, where the keys are the class names
-              and the values are the number of misclassifications.
+        dict: Class names mapped to their misclassification counts.
     """
     with open(val_classifier_json) as f:
         val_output = json.load(f)
+
     val_metrics_df = pd.DataFrame.from_dict(
         val_output["val_metrics_details"], orient="index"
     )
-    class_dict = dict()
-    for k, v in val_metrics_df["top_n_classes"].items():
-        class_dict[k] = v
-    return class_dict
+
+    return dict(val_metrics_df["top_n_classes"].items())
 
 
 def get_class_list(val_classifier_json):
     """
-    Retrieves the list of classes from the given validation classifier JSON file.
+    Get sorted list of classes from validation metrics.
 
     Args:
-        val_classifier_json (str): The path to the validation classifier JSON file.
+        val_classifier_json (str): Path to validation classifier JSON file.
 
     Returns:
-        list: A sorted list of class names extracted from the JSON file.
+        list: Sorted list of class names.
     """
     with open(val_classifier_json, "r") as f:
         data = json.load(f)
-    return sorted(list(data["val_metrics_details"].keys()))
+    return sorted(data["val_metrics_details"].keys())
 
 
 def generateClassPairs(val_classifier_json):
     """
-    Generate pairs of misclassified classes from the given validation classifier JSON.
+    Generate pairs of misclassified classes from validation metrics.
 
     Args:
-        val_classifier_json (str): The path to the validation classifier JSON file.
+        val_classifier_json (str): Path to validation classifier JSON file.
 
     Returns:
-        list: A sorted list of pairs of misclassified classes.
+        list: Sorted list of misclassified class pairs.
     """
     pairs = set()
     misclassified_classes = get_top_misclassified(val_classifier_json)
-    for key, value in misclassified_classes.items():
-        for v in value:
-            pairs.add(tuple(sorted([key, v])))
-    return sorted(list(pairs))
+
+    for key, values in misclassified_classes.items():
+        for value in values:
+            pairs.add(tuple(sorted([key, value])))
+
+    return sorted(pairs)
 
 
 def outputDirectory(class_pairs, synth_path, metadata_path):
     """
-    Creates the output directory structure for the synthesized data.
+    Create output directory structure for synthesized data.
 
     Args:
-        class_pairs (list): A list of class pairs.
-        synth_path (str): The path to the directory where the synthesized data will be stored.
-        metadata_path (str): The path to the directory where the metadata will be stored.
-
-    Returns:
-        None
+        class_pairs (list): List of class pairs.
+        synth_path (str): Path for synthesized data storage.
+        metadata_path (str): Path for metadata storage.
     """
-    for id in class_pairs:
-        class_folder = f"{synth_path}/{id}"
-        if not (os.path.exists(class_folder)):
-            os.makedirs(class_folder)
-    if not (os.path.exists(metadata_path)):
-        os.makedirs(metadata_path)
+    # Create directories for each class
+    for class_id in class_pairs:
+        class_folder = f"{synth_path}/{class_id}"
+        os.makedirs(class_folder, exist_ok=True)
+
+    # Create metadata directory
+    os.makedirs(metadata_path, exist_ok=True)
     print("Info: Output directory ready.")
 
 
@@ -221,6 +219,96 @@ def createPrompts(
         return prompts, negative_prompts
 
 
+def _slerp(v0, v1, num, t0=0, t1=1):
+    """
+    Perform spherical linear interpolation between two vectors.
+
+    Args:
+        v0 (torch.Tensor): Starting vector.
+        v1 (torch.Tensor): Ending vector.
+        num (int): Number of interpolation points.
+        t0 (float): Starting time (default: 0).
+        t1 (float): Ending time (default: 1).
+
+    Returns:
+        torch.Tensor: Interpolated vectors.
+
+    Reference:
+        Karpathy, A. (2022) 'hacky stablediffusion code for generating videos', Gist.
+    """
+    v0 = v0.detach().cpu().numpy()
+    v1 = v1.detach().cpu().numpy()
+
+    def interpolation(t, v0, v1, DOT_THRESHOLD=0.9995):
+        """Helper function to spherically interpolate two arrays."""
+        dot = np.sum(v0 * v1 / (np.linalg.norm(v0) * np.linalg.norm(v1)))
+        if np.abs(dot) > DOT_THRESHOLD:
+            v2 = (1 - t) * v0 + t * v1
+        else:
+            theta_0 = np.arccos(dot)
+            sin_theta_0 = np.sin(theta_0)
+            theta_t = theta_0 * t
+            sin_theta_t = np.sin(theta_t)
+            s0 = np.sin(theta_0 - theta_t) / sin_theta_0
+            s1 = sin_theta_t / sin_theta_0
+            v2 = s0 * v0 + s1 * v1
+        return v2
+
+    t = np.linspace(t0, t1, num)
+    v3 = torch.tensor(np.array([interpolation(t[i], v0, v1) for i in range(num)]))
+    return v3
+
+
+def _get_middle_elements(lst, n):
+    """
+    Get middle n elements from a list.
+
+    Args:
+        lst (list): Input list.
+        n (int): Number of middle elements to extract.
+
+    Returns:
+        tuple: (middle elements sublist, range of indices).
+    """
+    if n % 2 == 0:  # Even number of elements
+        middle_index = len(lst) // 2 - 1
+        start = middle_index - n // 2 + 1
+        end = middle_index + n // 2 + 1
+    else:  # Odd number of elements
+        middle_index = len(lst) // 2
+        start = middle_index - n // 2
+        end = middle_index + n // 2 + 1
+
+    return lst[start:end], range(start, end)
+
+
+def _remove_middle(data, n):
+    """
+    Remove middle n elements from a list.
+
+    Args:
+        data (list): Input list.
+        n (int): Number of middle elements to remove.
+
+    Returns:
+        list: List with middle n elements removed.
+
+    Raises:
+        ValueError: If n is invalid.
+    """
+    if n < 0 or n > len(data):
+        raise ValueError("Invalid n: must be non-negative and less than list length")
+
+    middle = len(data) // 2
+
+    if n == 1:
+        return data[:middle] + data[middle + 1 :]
+    elif n % 2 == 0:
+        return data[: middle - n // 2] + data[middle + n // 2 :]
+    else:
+        return data[: middle - n // 2] + data[middle + n // 2 + 1 :]
+
+
 def interpolatePrompts(
     prompts,
     pipeline,
@@ -230,139 +318,33 @@ def interpolatePrompts(
     device="cuda",
 ):
     """
-    Interpolates prompts by generating intermediate embeddings between pairs of prompts.
+    Interpolate prompts by generating intermediate embeddings between pairs.
 
     Args:
-        prompts (List[str]): A list of prompts to be interpolated.
-        pipeline: The pipeline object containing the tokenizer and text encoder.
-        num_interpolation_steps (int): The number of interpolation steps between each pair of prompts.
-        sample_mid_interpolation (int): The number of intermediate embeddings to sample from the middle of the interpolated prompts.
-        remove_n_middle (int, optional): The number of middle embeddings to remove from the interpolated prompts. Defaults to 0.
-        device (str, optional): The device to run the interpolation on. Defaults to "cuda".
+        prompts (List[str]): List of prompts to interpolate.
+        pipeline: Pipeline with tokenizer and text encoder.
+        num_interpolation_steps (int): Number of interpolation steps.
+        sample_mid_interpolation (int): Number of mid samples to keep.
+        remove_n_middle (int): Number of middle embeddings to remove.
+        device (str): Device for computation (default: "cuda").
 
     Returns:
-        interpolated_prompt_embeds (torch.Tensor): The interpolated prompt embeddings.
-        prompt_metadata (dict): Metadata about the interpolation process, including similarity scores and nearest class information.
+        tuple: (interpolated_prompt_embeds, prompt_metadata)
 
-    e.g. if num_interpolation_steps = 10, sample_mid_interpolation = 6, remove_n_middle = 2
-    Interpolated: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    Sampled:            [2, 3, 4, 5, 6, 7]
-    Removed:                   x  x
-    Returns:            [2, 3,       6, 7]
+    Example:
+        num_interpolation_steps = 10, sample_mid_interpolation = 6, remove_n_middle = 2
+        Interpolated: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        Sampled:            [2, 3, 4, 5, 6, 7]
+        Removed:                   x  x
+        Returns:            [2, 3,       6, 7]
+
+    Reference:
+        Akimov, R. (2024) 'Images Interpolation with Stable Diffusion'.
     """
-
-    ###############################
-    # Reference:
-    # Akimov, R. (2024) Images Interpolation with Stable Diffusion - Hugging Face Open-Source AI Cookbook. Available at: https://huggingface.co/learn/cookbook/en/stable_diffusion_interpolation (Accessed: 4 June 2024).
-    ###############################
-
-    def slerp(v0, v1, num, t0=0, t1=1):
-        """
-        Performs spherical linear interpolation between two vectors.
-
-        Args:
-            v0 (torch.Tensor): The starting vector.
-            v1 (torch.Tensor): The ending vector.
-            num (int): The number of interpolation points.
-            t0 (float, optional): The starting time. Defaults to 0.
-            t1 (float, optional): The ending time. Defaults to 1.
-
-        Returns:
-            torch.Tensor: The interpolated vectors.
-
-        """
-        ###############################
-        # Reference:
-        # Karpathy, A. (2022) hacky stablediffusion code for generating videos, Gist. Available at: https://gist.github.com/karpathy/00103b0037c5aaea32fe1da1af553355 (Accessed: 4 June 2024).
-        ###############################
-        v0 = v0.detach().cpu().numpy()
-        v1 = v1.detach().cpu().numpy()
-
-        def interpolation(t, v0, v1, DOT_THRESHOLD=0.9995):
-            """helper function to spherically interpolate two arrays v1 v2"""
-            dot = np.sum(v0 * v1 / (np.linalg.norm(v0) * np.linalg.norm(v1)))
-            if np.abs(dot) > DOT_THRESHOLD:
-                v2 = (1 - t) * v0 + t * v1
-            else:
-                theta_0 = np.arccos(dot)
-                sin_theta_0 = np.sin(theta_0)
-                theta_t = theta_0 * t
-                sin_theta_t = np.sin(theta_t)
-                s0 = np.sin(theta_0 - theta_t) / sin_theta_0
-                s1 = sin_theta_t / sin_theta_0
-                v2 = s0 * v0 + s1 * v1
-            return v2
-
-        t = np.linspace(t0, t1, num)
-
-        v3 = torch.tensor(np.array([interpolation(t[i], v0, v1) for i in range(num)]))
-
-        return v3
-
-    def get_middle_elements(lst, n):
-        """
-        Returns a tuple containing a sublist of the middle elements of the given list `lst` and a range of indices of those elements.
-
-        Args:
-            lst (list): The list from which to extract the middle elements.
-            n (int): The number of middle elements to extract.
-
-        Returns:
-            tuple: A tuple containing the sublist of middle elements and a range of indices.
-
-        Raises:
-            None
-
-        Examples:
-            lst = [1, 2, 3, 4, 5]
-            get_middle_elements(lst, 3)
-            ([2, 3, 4], range(2, 5))
-        """
-        if n % 2 == 0:  # Even number of elements
-            middle_index = len(lst) // 2 - 1
-            start = middle_index - n // 2 + 1
-            end = middle_index + n // 2 + 1
-            return lst[start:end], range(start, end)
-        else:  # Odd number of elements
-            middle_index = len(lst) // 2
-            start = middle_index - n // 2
-            end = middle_index + n // 2 + 1
-            return lst[start:end], range(start, end)
-
-    def remove_middle(data, n):
-        """
-        Remove the middle n elements from a list.
-
-        Args:
-            data (list): The input list.
-            n (int): The number of elements to remove from the middle of the list.
-
-        Returns:
-            list: The modified list with the middle n elements removed.
-
-        Raises:
-            ValueError: If n is negative or greater than the length of the list.
-
-        """
-        if n < 0 or n > len(data):
-            raise ValueError(
-                "Invalid value for n. It should be non-negative and less than half the list length"
-            )
-
-        # Find the middle index
-        middle = len(data) // 2
-
-        # Create slices to exclude the middle n elements
-        if n == 1:
-            return data[:middle] + data[middle + 1 :]
-        elif n % 2 == 0:
-            return data[: middle - n // 2] + data[middle + n // 2 :]
-        else:
-            return data[: middle - n // 2] + data[middle + n // 2 + 1 :]
 
     batch_size = len(prompts)
 
-    # Tokenizing and encoding prompts into embeddings.
+    # Tokenize and encode prompts into embeddings
     prompts_tokens = pipeline.tokenizer(
         prompts,
         padding="max_length",
@@ -372,27 +354,33 @@ def interpolatePrompts(
     )
     prompts_embeds = pipeline.text_encoder(prompts_tokens.input_ids.to(device))[0]
 
-    # Interpolating between embeddings pairs for the given number of interpolation steps.
+    # Interpolate between embedding pairs
     interpolated_prompt_embeds = []
-
     for i in range(batch_size - 1):
         interpolated_prompt_embeds.append(
-            slerp(prompts_embeds[i], prompts_embeds[i + 1], num_interpolation_steps)
+            _slerp(prompts_embeds[i], prompts_embeds[i + 1], num_interpolation_steps)
         )
 
+    # Keep full interpolations for metadata calculation
     full_interpolated_prompt_embeds = interpolated_prompt_embeds[:]
-    interpolated_prompt_embeds[0], sample_range = get_middle_elements(
+
+    # Sample middle elements
+    interpolated_prompt_embeds[0], sample_range = _get_middle_elements(
         interpolated_prompt_embeds[0], sample_mid_interpolation
     )
 
+    # Remove center elements if requested
     if remove_n_middle > 0:
-        interpolated_prompt_embeds[0] = remove_middle(
+        interpolated_prompt_embeds[0] = _remove_middle(
             interpolated_prompt_embeds[0], remove_n_middle
         )
 
-    prompt_metadata = dict()
+    # Calculate similarity metadata
+    prompt_metadata = {}
     similarity = nn.CosineSimilarity(dim=-1, eps=1e-6)
+
     for i in range(num_interpolation_steps):
+        # Calculate similarities to both class embeddings
         class1_sim = (
             similarity(
                 full_interpolated_prompt_embeds[0][0],
@@ -409,6 +397,8 @@ def interpolatePrompts(
             .mean()
             .item()
         )
+
+        # Calculate relative distance
         relative_distance = class1_sim / (class1_sim + class2_sim)
 
         prompt_metadata[i] = {
@@ -422,6 +412,7 @@ def interpolatePrompts(
             "nearest_class": int(relative_distance < 0.5),
         }
 
+    # Concatenate and return
     interpolated_prompt_embeds = torch.cat(interpolated_prompt_embeds, dim=0).to(device)
     return interpolated_prompt_embeds, prompt_metadata
 

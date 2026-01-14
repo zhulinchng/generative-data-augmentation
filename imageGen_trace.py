@@ -1,6 +1,9 @@
 """
-For debugging and analysis purposes, this script generates the trace for the image generation process.
-Refer to imageGen.py for the main image generation script.
+Generate trace data for image generation process analysis and debugging.
+
+This script creates detailed trace information for the synthetic image generation
+pipeline, useful for debugging and analyzing the interpolation process.
+See imageGen.py for the main generation script.
 """
 
 from collections import Counter
@@ -11,6 +14,7 @@ from tqdm import tqdm
 
 from tools import classes, data, synth
 
+# Enable performance optimizations
 torch.backends.cudnn.benchmark = True
 torch.backends.cuda.matmul.allow_tf32 = True
 

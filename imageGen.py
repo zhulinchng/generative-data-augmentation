@@ -1,10 +1,11 @@
 """
-Script to generate synthetic images for the specified dataset.
+Generate synthetic images for dataset augmentation using Stable Diffusion.
 
-The script generates synthetic images for each class pair of the confusing/top-misclassified classes in the dataset.
-Each run of the script generates approximately 1:1 ratio of train-to-synthetic images.
+This script generates synthetic images for confusing class pairs identified from
+validation metrics. It uses image-to-image diffusion with prompt interpolation
+to create training data that helps improve classifier performance.
 
-While the script works in both Windows and Linux, it is recommended to run the script in Linux for better performance as torch.compile() is not supported in Windows.
+Note: Linux is recommended for optimal performance (torch.compile support).
 """
 
 from collections import Counter
@@ -14,148 +15,162 @@ from tqdm import tqdm
 
 from tools import classes, data, synth
 
+# Enable performance optimizations
 torch.backends.cudnn.benchmark = True
 torch.backends.cuda.matmul.allow_tf32 = True
 
-### Load Data ###
+# Configuration
+DATASET_TYPE = "data/imagewoof"  # Path to dataset
 
-dataset_type = "data/imagewoof"  # path to dataset
+# Setup paths
+cache_path = f"./{DATASET_TYPE}"
+genInput_dir = f"{DATASET_TYPE}/train"
+synth_path = f"{DATASET_TYPE}/synthetic"
+metadata_path = f"{DATASET_TYPE}/metadata"
+val_classifier_json = f"{DATASET_TYPE}/val.json"
 
-cache_path = f"./{dataset_type}"
-genInput_dir = f"{dataset_type}/train"
-synth_path = f"{dataset_type}/synthetic"
-metadata_path = f"{dataset_type}/metadata"
-val_classifier_json = f"{dataset_type}/val.json"
-# get the top 5 misclassified classes from dev from base classifier
+# Load class pairs from validation metrics
 class_list = synth.get_class_list(val_classifier_json)
-# combine all misclassified class pairs
 class_pairs_combo = synth.generateClassPairs(val_classifier_json)
+
+# Cache and load input dataset
 data.cacheGenData(
     genInput_dir, "imagenet_inputImg", save_path=cache_path, resize=(512, 512)
 )
 genInput_dataset = data.loadData("imagenet_inputImg", cache_path=cache_path)
-
 img_subsets = data.getSubsets(genInput_dataset, genInput_dir)
 
-print(f"Running for {dataset_type}.")
+print(f"Running for {DATASET_TYPE}.")
 
-### Parameters for Image Generation ###
+# Image Generation Parameters
+# Prompt format adapted from "Learning Transferable Visual Models From Natural Language Supervision"
+PROMPT_FORMAT = (
+    "a photo of a <class_name>, a type of dog"  # Add ", a type of dog" for dog datasets
+)
+NEGATIVE_PROMPT = "blurry image, disfigured, deformed, distorted, cartoon, drawings"
 
-# prompt adapted from Learning Transferable Visual Models From Natural Language Supervision
-# prompt_format = "a photo of a <class_name>"
-prompt_format = "a photo of a <class_name>, a type of dog"
-# add ", a type of dog" for imagewoof/stanford dogs
+# Model configuration
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+MODEL_ID = "runwayml/stable-diffusion-v1-5"  # Or use "./models/stable-diffusion-v1-5" for local
 
-negative_prompt = "blurry image, disfigured, deformed, distorted, cartoon, drawings"  # adapted from 10.1007/978-3-031-44237-7_14
+# Generation parameters
+IMAGE_HEIGHT = 512
+IMAGE_WIDTH = 512
+GUIDANCE_SCALE = 8  # Guidance scale in normal range (7-10)
+NUM_INFERENCE_STEPS = 25  # Empirically chosen for quality/speed balance
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model_id_or_path = "runwayml/stable-diffusion-v1-5"
-# model_id_or_path = "./models/stable-diffusion-v1-5"  # if available locally
+# Interpolation parameters
+NUM_INTERPOLATION_STEPS = 16
+SAMPLE_MID_INTERPOLATION = 16
+REMOVE_N_MIDDLE = 0
 
-height, width = 512, 512  # set the optimal image size for the model
+# Validate interpolation parameters
+assert NUM_INTERPOLATION_STEPS % 2 == 0, "Interpolation steps must be even"
+assert SAMPLE_MID_INTERPOLATION % 2 == 0, "Sample mid interpolation must be even"
+assert REMOVE_N_MIDDLE % 2 == 0, "Remove n middle must be even"
+assert (
+    NUM_INTERPOLATION_STEPS >= SAMPLE_MID_INTERPOLATION
+), "Interpolation steps must be >= sample mid"
+assert (
+    NUM_INTERPOLATION_STEPS >= 2 and SAMPLE_MID_INTERPOLATION >= 2
+), "Minimum 2 steps required"
+assert SAMPLE_MID_INTERPOLATION - REMOVE_N_MIDDLE >= 2, "Must keep at least 2 samples"
 
-# The guidance scale is set to its normal range (7 - 10).
-guidance_scale = 8
+# Initialize pipeline
+pipe = synth.pipe_img(MODEL_ID, device=DEVICE)
 
-# The number of inference steps was chosen empirically to generate an acceptable picture within an acceptable time.
-num_inference_steps = 25
-
-# Again, these values were chosen empirically.
-num_interpolation_steps = 16
-sample_mid_interpolation = 16
-remove_n_middle = 0
-
-### Interpolation Checks ###
-
-assert num_interpolation_steps % 2 == 0
-assert sample_mid_interpolation % 2 == 0
-assert remove_n_middle % 2 == 0
-assert num_interpolation_steps >= sample_mid_interpolation
-assert num_interpolation_steps >= 2 and sample_mid_interpolation >= 2
-assert sample_mid_interpolation - remove_n_middle >= 2
-
-# Setup pipeline
-
-pipe = synth.pipe_img(model_id_or_path, device=device)
-
-# To reproduce: 4796730343513556238 for woof, 1127962904372660145 for stanford dogs, 18316237598377439927 for imagenette
+# Set random seed for reproducibility
+# Seeds: 4796730343513556238 (woof), 1127962904372660145 (stanford dogs), 18316237598377439927 (imagenette)
 seed = torch.Generator().seed()
 print(f"Seed: {seed}")
 
-class_iterables = dict()
-for c in class_list:
-    total_pair_count = Counter(c == x or c == y for x, y in class_pairs_combo)[True]
-    class_iterables[c] = synth.getPairIndices(
-        len(img_subsets[c]), total_pair_count, seed=seed
+# Prepare class iterables for pair generation
+class_iterables = {}
+for class_id in class_list:
+    total_pair_count = Counter(
+        class_id == x or class_id == y for x, y in class_pairs_combo
+    )[True]
+    class_iterables[class_id] = synth.getPairIndices(
+        len(img_subsets[class_id]), total_pair_count, seed=seed
     )
 
-# Generate Images for each class pair
+# Generate images for each class pair
 for combo_iter, class_pairs in enumerate(tqdm(class_pairs_combo)):
+    # Get class names from ImageNet mapping
     class_name_pairs = (
         classes.IMAGENET2012_CLASSES[class_pairs[0]],
         classes.IMAGENET2012_CLASSES[class_pairs[1]],
     )
+
+    # Setup output directories
     synth.outputDirectory(class_pairs, synth_path, metadata_path)
+
+    # Create prompts for the class pair
     prompts, negative_prompts = synth.createPrompts(
         class_name_pairs,
-        prompt_structure=prompt_format,
-        negative_prompt=negative_prompt,
+        prompt_structure=PROMPT_FORMAT,
+        negative_prompt=NEGATIVE_PROMPT,
     )
     print(f"Generating images for {prompts[0]} and {prompts[1]}.")
+
+    # Interpolate positive prompts
     interpolated_prompt_embeds, prompt_metadata = synth.interpolatePrompts(
         prompts,
         pipe,
-        num_interpolation_steps,
-        sample_mid_interpolation,
-        remove_n_middle=remove_n_middle,
-        device=device,
+        NUM_INTERPOLATION_STEPS,
+        SAMPLE_MID_INTERPOLATION,
+        remove_n_middle=REMOVE_N_MIDDLE,
+        device=DEVICE,
     )
+
+    # Interpolate negative prompts if provided
     if negative_prompts is not None:
         interpolated_negative_prompts_embeds, negative_prompt_metadata = (
             synth.interpolatePrompts(
                 negative_prompts,
                 pipe,
-                num_interpolation_steps,
-                sample_mid_interpolation,
-                remove_n_middle=remove_n_middle,
-                device=device,
+                NUM_INTERPOLATION_STEPS,
+                SAMPLE_MID_INTERPOLATION,
+                remove_n_middle=REMOVE_N_MIDDLE,
+                device=DEVICE,
             )
         )
     else:
-        interpolated_negative_prompts_embeds, negative_prompt_metadata = [None] * len(
-            interpolated_prompt_embeds
-        ), None
+        interpolated_negative_prompts_embeds = [None] * len(interpolated_prompt_embeds)
+        negative_prompt_metadata = None
 
+    # Generate synthetic images
     ssim_scores = synth.generateImagesFromDataset(
         img_subsets,
         class_iterables,
         pipe,
         interpolated_prompt_embeds,
         interpolated_negative_prompts_embeds,
-        num_inference_steps,
-        guidance_scale,
-        height=height,
-        width=width,
+        NUM_INFERENCE_STEPS,
+        GUIDANCE_SCALE,
+        height=IMAGE_HEIGHT,
+        width=IMAGE_WIDTH,
         seed=seed,
         save_path=synth_path,
         class_pairs=class_pairs,
         save_image=True,
         image_type="jpg",
         interpolate_range="nearest",
-        device=device,
+        device=DEVICE,
         return_images=False,
     )
 
+    # Save metadata for this class pair
     metadata = synth.getMetadata(
         class_pairs,
         synth_path,
         seed,
-        guidance_scale,
-        num_inference_steps,
-        num_interpolation_steps,
-        sample_mid_interpolation,
-        height,
-        width,
+        GUIDANCE_SCALE,
+        NUM_INFERENCE_STEPS,
+        NUM_INTERPOLATION_STEPS,
+        SAMPLE_MID_INTERPOLATION,
+        IMAGE_HEIGHT,
+        IMAGE_WIDTH,
         prompts,
         negative_prompts,
         pipe,

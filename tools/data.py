@@ -1,25 +1,8 @@
 """
-Helper functions for data processing and caching.
+Data processing and caching utilities for image classification.
 
-Functions:
-    - get_module
-    - ClassificationPresetTrain
-    - ClassificationPresetEval
-    - cacheTrainData
-    - cacheValData
-    - loadData
-    - cacheGenData
-    - getSubsetIndicies
-    - getSubsetsFromIndicies
-    - getSubsets
-    - cacheAllInterpolation
-    - loadAllInterpolation
-    - getSubsetsByInterpolation
-    - getValSampler
-    - getSubsetLoader
-    - getSubsetLoaderbyInterpolation
-    - mix_Data
-    - synthetic_only_Data
+This module provides functions for loading, caching, and transforming datasets,
+as well as creating data loaders and managing synthetic data organization.
 """
 
 import os
@@ -31,13 +14,11 @@ from torch.utils.data import DataLoader, Subset
 from torchvision import transforms
 from torchvision.transforms.functional import InterpolationMode
 
-# Set default cache path
+# Default configuration
+DEFAULT_CACHE_PATH = "./data"
 
-cache_path = "./data"
-
-# Set default parameters for training and validation transformations
-
-train_param = {
+# Default training transformation parameters
+DEFAULT_TRAIN_PARAMS = {
     "train_crop_size": 224,
     "interpolation": "bilinear",
     "auto_augment": None,
@@ -48,7 +29,8 @@ train_param = {
     "use_v2": False,
 }
 
-val_param = {
+# Default validation transformation parameters
+DEFAULT_VAL_PARAMS = {
     "val_resize_size": 256,
     "val_crop_size": 224,
     "interpolation": "bilinear",
@@ -59,29 +41,25 @@ val_param = {
 
 def get_module(use_v2):
     """
-    Returns the appropriate module from the torchvision.transforms package based on the value of use_v2.
+    Get appropriate torchvision transforms module.
 
-    Parameters:
-        use_v2 (bool): If True, returns the v2 module from torchvision.transforms.v2. If False, returns the module from torchvision.transforms.
+    Args:
+        use_v2 (bool): If True, use v2 transforms; otherwise use v1.
 
     Returns:
-        module: The selected module from torchvision.transforms or torchvision.transforms.v2.
+        module: Selected transforms module.
+
+    Reference:
+        TorchVision maintainers and contributors (2016).
     """
-
-    ############################
-    # Reference:
-    # TorchVision maintainers and contributors (2016) 'TorchVision: PyTorch's computer vision library'. GitHub. Available at: https://github.com/pytorch/vision.
-    ############################
-
-    # We need a protected import to avoid the V2 warning in case just V1 is used
     if use_v2:
         import torchvision.transforms.v2
 
         return torchvision.transforms.v2
-    else:
-        import torchvision.transforms
 
-        return torchvision.transforms
+    import torchvision.transforms
+
+    return torchvision.transforms
 
 
 class ClassificationPresetTrain:
@@ -248,32 +226,30 @@ class ClassificationPresetEval:
 def cacheTrainData(
     train_dir,
     ds_name,
-    save_path=cache_path,
-    default_param=train_param,
-    stats={"mean": (0.485, 0.456, 0.406), "std": (0.229, 0.224, 0.225)},
+    save_path=DEFAULT_CACHE_PATH,
+    default_param=DEFAULT_TRAIN_PARAMS,
+    stats=None,
 ):
     """
-    Caches the ImageNet dataset for training.
+    Cache training dataset with transformations.
 
     Args:
-        train_dir (str): The directory path containing the training images.
-        ds_name (str): The name of the dataset.
-        save_path (str, optional): The directory path to save the cached dataset. Defaults to cache_path.
-        default_param (dict, optional): The default parameters for the dataset. Defaults to train_param.
-        stats (dict, optional): The statistics for normalization. Defaults to {"mean": (0.485, 0.456, 0.406), "std": (0.229, 0.224, 0.225)}.
+        train_dir (str): Directory containing training images.
+        ds_name (str): Dataset name for saving.
+        save_path (str): Directory to save cached dataset.
+        default_param (dict): Transformation parameters.
+        stats (dict): Normalization statistics (mean, std).
 
     Returns:
         None
     """
-    ############################
-    # Reference:
-    # TorchVision maintainers and contributors (2016) 'TorchVision: PyTorch's computer vision library'. GitHub. Available at: https://github.com/pytorch/vision.
-    ############################
+    if stats is None:
+        stats = {"mean": (0.485, 0.456, 0.406), "std": (0.229, 0.224, 0.225)}
 
-    # Load the ImageNet dataset statistics
     mean = stats["mean"]
     std = stats["std"]
 
+    # Create dataset with training transformations
     dataset = torchvision.datasets.ImageFolder(
         train_dir,
         ClassificationPresetTrain(
@@ -292,42 +268,39 @@ def cacheTrainData(
         ),
     )
 
-    # Create directory if not exist
+    # Save cached dataset
     os.makedirs(save_path, exist_ok=True)
-    # Save the dataset to tensor file
     torch.save(dataset, os.path.join(save_path, f"{ds_name}.pt"))
     print(f"{ds_name}.pt dataset saved to {save_path}")
-    return None
 
 
 def cacheValData(
     valdir,
     ds_name,
-    save_path=cache_path,
-    default_param=val_param,
-    stats={"mean": (0.485, 0.456, 0.406), "std": (0.229, 0.224, 0.225)},
+    save_path=DEFAULT_CACHE_PATH,
+    default_param=DEFAULT_VAL_PARAMS,
+    stats=None,
 ):
     """
-    Caches the ImageNet validation dataset to a tensor file.
+    Cache validation dataset with transformations.
 
     Args:
-        valdir (str): Path to the validation dataset directory.
-        ds_name (str): Name of the dataset.
-        save_path (str, optional): Path to save the cached dataset. Defaults to cache_path.
-        default_param (dict, optional): Default parameters for dataset creation. Defaults to val_param.
-        stats (dict, optional): Dictionary containing the mean and standard deviation values for normalization.
-                               Defaults to {"mean": (0.485, 0.456, 0.406), "std": (0.229, 0.224, 0.225)}.
+        valdir (str): Directory containing validation images.
+        ds_name (str): Dataset name for saving.
+        save_path (str): Directory to save cached dataset.
+        default_param (dict): Transformation parameters.
+        stats (dict): Normalization statistics (mean, std).
 
     Returns:
         None
     """
-    ############################
-    # Reference:
-    # TorchVision maintainers and contributors (2016) 'TorchVision: PyTorch's computer vision library'. GitHub. Available at: https://github.com/pytorch/vision.
-    ############################
+    if stats is None:
+        stats = {"mean": (0.485, 0.456, 0.406), "std": (0.229, 0.224, 0.225)}
+
     mean = stats["mean"]
     std = stats["std"]
-    # Load the ImageNet dataset
+
+    # Create dataset with validation transformations
     dataset = torchvision.datasets.ImageFolder(
         valdir,
         ClassificationPresetEval(
@@ -343,75 +316,72 @@ def cacheValData(
         ),
     )
 
-    # Create directory if not exist
+    # Save cached dataset
     os.makedirs(save_path, exist_ok=True)
-    # Save the dataset to tensor file
     torch.save(dataset, os.path.join(save_path, f"{ds_name}.pt"))
     print(f"{ds_name}.pt dataset saved to {save_path}")
-    return None
 
 
-def loadData(file_name, cache_path=cache_path):
+def loadData(file_name, cache_path=DEFAULT_CACHE_PATH):
     """
-    Load a dataset from a cache path if it exists, otherwise print a message indicating that the dataset was not found.
+    Load cached dataset from disk.
 
     Args:
-        file_name (str): The name of the dataset file.
-        cache_path (str, optional): The path to the cache directory. Defaults to cache_path.
+        file_name (str): Name of the dataset file (without .pt extension).
+        cache_path (str): Path to cache directory.
 
     Returns:
-        dataset: The loaded dataset if it exists, otherwise None.
+        dataset: Loaded dataset or None if not found.
     """
-    if os.path.exists(cache_path):
-        dataset = torch.load(
-            os.path.join(cache_path, f"{file_name}.pt"), weights_only=False
-        )
+    if not os.path.exists(cache_path):
+        print(f"Cache path {cache_path} does not exist")
+        return None
+
+    dataset_path = os.path.join(cache_path, f"{file_name}.pt")
+    if os.path.exists(dataset_path):
+        dataset = torch.load(dataset_path, weights_only=False)
         print(f"{file_name}.pt dataset loaded from {cache_path}")
-    else:
-        print(f"{file_name}.pt not found in {cache_path}")
-        dataset = None
-    return dataset
+        return dataset
+
+    print(f"{file_name}.pt not found in {cache_path}")
+    return None
 
 
 def cacheGenData(
     genInput_dir,
     ds_name,
-    save_path=cache_path,
+    save_path=DEFAULT_CACHE_PATH,
     resize=(256, 256),
     do_rescale=True,
 ):
     """
-    Caches the ImageNet dataset generated from the given directory.
+    Cache generated dataset for synthetic image pipeline.
 
     Args:
-        genInput_dir (str): The directory containing the generated dataset.
-        ds_name (str): The name of the dataset.
-        save_path (str, optional): The path to save the cached dataset. Defaults to cache_path.
-        resize (tuple, optional): The size to resize the images to. Defaults to (256, 256).
-        do_rescale (bool, optional): Whether to rescale the images or not. Defaults to True.
+        genInput_dir (str): Directory containing generated images.
+        ds_name (str): Dataset name for saving.
+        save_path (str): Directory to save cached dataset.
+        resize (tuple): Target size for image resizing.
+        do_rescale (bool): Whether to rescale images.
 
     Returns:
         None
     """
-    # Load the ImageNet dataset
+    # Define transformation based on rescale option
     if do_rescale:
-        dataset = torchvision.datasets.ImageFolder(
-            genInput_dir,
-            transform=transforms.Compose(
-                [transforms.ToTensor(), transforms.Resize(resize)]
-            ),
+        transform = transforms.Compose(
+            [transforms.ToTensor(), transforms.Resize(resize)]
         )
     else:
-        dataset = torchvision.datasets.ImageFolder(
-            genInput_dir, transform=transforms.Compose([transforms.PILToTensor()])
-        )
+        transform = transforms.Compose([transforms.PILToTensor()])
 
-    # Create directory if not exist
+    # Create dataset
+    dataset = torchvision.datasets.ImageFolder(genInput_dir, transform=transform)
+
+    # Save cached dataset
     os.makedirs(save_path, exist_ok=True)
-    # Save the dataset to tensor file
     torch.save(dataset, os.path.join(save_path, f"{ds_name}.pt"))
     print(f"{ds_name}.pt dataset saved to {save_path}")
-    return None
 
 
 def getSubsetIndicies(dataset, data_dir):

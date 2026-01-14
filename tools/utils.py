@@ -22,11 +22,10 @@ import schedulefree
 import torch
 import torch.distributed as dist
 import torch.utils.data
+import wandb
 from torch import Tensor, nn
 from torchvision.transforms import functional as F
 from tqdm import tqdm
-
-import wandb
 
 
 def setup_for_distributed(is_master):
