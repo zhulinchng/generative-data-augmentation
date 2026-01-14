@@ -112,12 +112,9 @@ def main():
     else:
         torch.backends.cudnn.benchmark = True
 
-    # Load and validate training dataset
+    # Load training dataset
     train_dataset = data.loadData("train_cache", cache_path=setup["data_path"])
     num_classes = len(train_dataset.classes)
-    assert (
-        num_classes == 10
-    ), f"Expected 10 classes, got {num_classes}"  # 10 for imagenette/woof, 120 for stanford-dogs
 
     # Create training data loader
     train_sampler = utils.getTrainSampler(train_dataset, setup)
@@ -131,11 +128,12 @@ def main():
         collate_fn=collate_fn,
     )
 
-    # Load and validate validation dataset
+    # Load validation dataset
     val_dataset = data.loadData("val_cache", cache_path=setup["data_path"])
-    assert (
-        len(val_dataset.classes) == 10
-    ), f"Expected 10 classes, got {len(val_dataset.classes)}"
+    assert len(val_dataset.classes) == num_classes, (
+        f"Training dataset has {num_classes} classes but validation dataset has "
+        f"{len(val_dataset.classes)} classes"
+    )
 
     # Create validation data loader
     val_sampler = utils.getValSampler(val_dataset, setup)
