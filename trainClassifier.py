@@ -130,6 +130,10 @@ def main():
 
     # Load validation dataset
     val_dataset = data.loadData("val_cache", cache_path=setup["data_path"])
+    assert len(val_dataset.classes) == num_classes, (
+        f"Training dataset has {num_classes} classes but validation dataset has "
+        f"{len(val_dataset.classes)} classes"
+    )
 
     # Create validation data loader
     val_sampler = utils.getValSampler(val_dataset, setup)
