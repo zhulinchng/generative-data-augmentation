@@ -1,19 +1,12 @@
 """
-Helper script to implement MixUp and CutMix augmentations.
-The script is based on the implementation in the TorchVision library.
+MixUp and CutMix augmentation implementations.
 
-Functions:
-    - get_module
-    - get_mixup_cutmix
-    - RandomMixUp
-    - RandomCutMix
-    - getCollateFn
+This module provides data augmentation techniques for improving model generalization,
+based on the TorchVision library implementations.
+
+Reference:
+TorchVision maintainers and contributors (2016) 'TorchVision: PyTorch's computer vision library'.
 """
-
-############################
-# Reference:
-# TorchVision maintainers and contributors (2016) 'TorchVision: PyTorch's computer vision library'. GitHub. Available at: https://github.com/pytorch/vision.
-############################
 
 import math
 from typing import Tuple
@@ -26,68 +19,66 @@ from torchvision.transforms import functional as F
 
 def get_module(use_v2):
     """
-    Returns the appropriate module for torchvision transforms based on the value of `use_v2`.
+    Get appropriate torchvision transforms module.
 
-    Parameters:
-    - use_v2 (bool): If True, returns the v2 module of torchvision.transforms. If False, returns the default module.
+    Args:
+        use_v2 (bool): If True, use v2 transforms; otherwise use v1.
 
     Returns:
-    - module: The module for torchvision transforms.
-
-    References:
-    - TorchVision maintainers and contributors (2016) 'TorchVision: PyTorch's computer vision library'. GitHub. Available at: https://github.com/pytorch/vision.
+        module: Selected transforms module.
     """
-    ############################
-    # Reference:
-    # TorchVision maintainers and contributors (2016) 'TorchVision: PyTorch's computer vision library'. GitHub. Available at: https://github.com/pytorch/vision.
-    ############################
-    # We need a protected import to avoid the V2 warning in case just V1 is used
     if use_v2:
         import torchvision.transforms.v2
 
         return torchvision.transforms.v2
-    else:
-        import torchvision.transforms
 
-        return torchvision.transforms
+    import torchvision.transforms
+
+    return torchvision.transforms
 
 
 def get_mixup_cutmix(*, mixup_alpha, cutmix_alpha, num_classes, use_v2):
     """
-    Returns a random transformation from MixUp and CutMix based on the provided parameters.
+    Create MixUp and/or CutMix augmentation transforms.
 
     Args:
-        mixup_alpha (float): The alpha value for MixUp transformation.
-        cutmix_alpha (float): The alpha value for CutMix transformation.
-        num_classes (int): The number of classes in the dataset.
-        use_v2 (bool): A flag indicating whether to use the v2 version of the transforms module.
+        mixup_alpha (float): Alpha parameter for MixUp.
+        cutmix_alpha (float): Alpha parameter for CutMix.
+        num_classes (int): Number of classes in dataset.
+        use_v2 (bool): Whether to use v2 transforms.
 
     Returns:
-        A random transformation from MixUp and CutMix, or None if both mixup_alpha and cutmix_alpha are 0.
+        RandomChoice transform or None if both alphas are 0.
     """
-    ############################
-    # Reference:
-    # TorchVision maintainers and contributors (2016) 'TorchVision: PyTorch's computer vision library'. GitHub. Available at: https://github.com/pytorch/vision.
-    ############################
     transforms_module = get_module(use_v2)
+    transforms_list = []
 
-    mixup_cutmix = []
+    # Add MixUp if alpha > 0
     if mixup_alpha > 0:
-        mixup_cutmix.append(
-            transforms_module.MixUp(alpha=mixup_alpha, num_classes=num_classes)
-            if use_v2
-            else RandomMixUp(num_classes=num_classes, p=1.0, alpha=mixup_alpha)
-        )
+        if use_v2:
+            transforms_list.append(
+                transforms_module.MixUp(alpha=mixup_alpha, num_classes=num_classes)
+            )
+        else:
+            transforms_list.append(
+                RandomMixUp(num_classes=num_classes, p=1.0, alpha=mixup_alpha)
+            )
+
+    # Add CutMix if alpha > 0 (note: using cutmix_alpha, not mixup_alpha)
     if cutmix_alpha > 0:
-        mixup_cutmix.append(
-            transforms_module.CutMix(alpha=mixup_alpha, num_classes=num_classes)
-            if use_v2
-            else RandomCutMix(num_classes=num_classes, p=1.0, alpha=mixup_alpha)
-        )
-    if not mixup_cutmix:
+        if use_v2:
+            transforms_list.append(
+                transforms_module.CutMix(alpha=cutmix_alpha, num_classes=num_classes)
+            )
+        else:
+            transforms_list.append(
+                RandomCutMix(num_classes=num_classes, p=1.0, alpha=cutmix_alpha)
+            )
+
+    if not transforms_list:
         return None
 
-    return transforms_module.RandomChoice(mixup_cutmix)
+    return transforms_module.RandomChoice(transforms_list)
 
 
 class RandomMixUp(torch.nn.Module):
@@ -299,33 +290,24 @@ class RandomCutMix(torch.nn.Module):
 
 def getCollateFn(num_classes, setup: dict, get_mixup_cutmix=get_mixup_cutmix):
     """
-    Returns a collate function for data batching that applies mixup or cutmix transformations.
+    Create collate function with optional MixUp/CutMix transforms.
 
     Args:
-        num_classes (int): The number of classes in the dataset.
-        setup (dict): A dictionary containing setup parameters for mixup and cutmix.
-        get_mixup_cutmix (function, optional): A function that returns mixup or cutmix transformation.
-            Defaults to get_mixup_cutmix.
+        num_classes (int): Number of classes in dataset.
+        setup (dict): Configuration with mixup_alpha, cutmix_alpha, and use_v2.
+        get_mixup_cutmix (function): Function to create transforms.
 
     Returns:
-        collate_fn (function): The collate function for data batching.
+        function: Collate function for DataLoader.
     """
-    ############################
-    # Reference:
-    # TorchVision maintainers and contributors (2016) 'TorchVision: PyTorch's computer vision library'. GitHub. Available at: https://github.com/pytorch/vision.
-    ############################
     mixup_cutmix = get_mixup_cutmix(
         mixup_alpha=setup["mixup_alpha"],
         cutmix_alpha=setup["cutmix_alpha"],
         num_classes=num_classes,
         use_v2=setup["use_v2"],
     )
+
     if mixup_cutmix is not None:
+        return lambda batch: mixup_cutmix(*default_collate(batch))
 
-        def collate_fn(batch):
-            return mixup_cutmix(*default_collate(batch))
-
-    else:
-        collate_fn = default_collate
-
-    return collate_fn
+    return default_collate
