@@ -297,7 +297,7 @@ def _remove_middle(data, n):
         ValueError: If n is invalid.
     """
     if n < 0 or n > len(data):
-        raise ValueError("Invalid n: must be non-negative and less than list length")
+        raise ValueError("Invalid n: must be non-negative and not exceed list length")
 
     middle = len(data) // 2
 
